@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 func main() {
 	// ./worker -workerId 1 -port 3001
 	// go func() {
+	start := time.Now()
 	cmd := exec.Command("bin/worker.linux", "-workerId", "1", "-port", "3001")
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -34,4 +36,6 @@ func main() {
 	}
 	defer res.Body.Close()
 	io.Copy(os.Stdout, res.Body)
+	elapsed := time.Since(start)
+	fmt.Println(elapsed)
 }
