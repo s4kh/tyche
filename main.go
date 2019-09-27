@@ -13,6 +13,13 @@ import (
 
 func main() {
 	// ./worker -workerId 1 -port 3001
+	/*
+		TODOs:
+		1. Consume numbers count them using new line
+		2. Spawn multiple workers with different id and port
+		 a. How to know which workers are ready to accept request
+		3. Send requests to workers - multiple clients also
+	*/
 	// go func() {
 	start := time.Now()
 	cmd := exec.Command("bin/worker.linux", "-workerId", "1", "-port", "3001")
