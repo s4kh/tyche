@@ -35,19 +35,15 @@ func callEndpoint(wg *sync.WaitGroup, endpoint string) {
 		log.Fatal(err)
 	}
 	defer res.Body.Close()
+
 	p := make([]byte, 7) // rnd=99\n is 7 bytes
 	for {
 		n, err := res.Body.Read(p)
-		if err != nil || err == io.EOF {
+		if err != nil || err == io.EOF { // response ended or worker crashed
 			break
 		}
 		fmt.Printf("%s", string(p[:n]))
 	}
-	// written, err := io.Copy(os.Stdout, res.Body)
-	// if err != nil {
-	// 	fmt.Println("Error", err)
-	// }
-	// fmt.Println(res.Body.Read())
 	fmt.Printf("Consumer finished: %s\n", endpoint)
 }
 
@@ -68,7 +64,7 @@ func main() {
 		spawnWorker(workerID, port)
 		// Have to wait?
 		time.Sleep(5 * time.Millisecond)
-		endpoint := "http://localhost:" + port + "/rnd?n=100"
+		endpoint := "http://localhost:" + port + "/rnd?n=2"
 		wg.Add(1)
 		go callEndpoint(&wg, endpoint)
 	}
