@@ -29,13 +29,14 @@ func spawnWorker(workerID string, port string) {
 func callEndpoint(wg *sync.WaitGroup, endpoint string) {
 	defer wg.Done()
 
+	fmt.Println("Consumer started:", endpoint)
 	res, err := http.Get(endpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer res.Body.Close()
 	io.Copy(os.Stdout, res.Body)
-	fmt.Println("consumed ", endpoint)
+	fmt.Println("Consumer finished:", endpoint)
 }
 
 func main() {
