@@ -54,10 +54,7 @@ func callEndpoint(wg *sync.WaitGroup, endpoint string, ch chan int) {
 func main() {
 	/*
 		TODOs:
-		1. Consume numbers count them using new line
-		2. Spawn multiple workers with different id and port
-		 a. How to know which workers are ready to accept request
-		3. Send requests to workers - multiple clients also
+		What is Data sample? 150 data samples
 	*/
 	start := time.Now()
 	var wg sync.WaitGroup
