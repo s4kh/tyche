@@ -4,6 +4,7 @@
 3. Make it concurrent
 4. Check whether it satisfies the requirements
 5. Optimize
+6. __Create worker pool size of 16. Whenever there is an idle worker in the pool we can start task for our 150 data sample.__
 
 ## Solution
 Spawns 16 workers with different `workerID` and `port` to get numbers from. Consumers are `goroutines`, called right after spawning the worker with same `port` then send requests and processes response. The ratio is 1:1.
