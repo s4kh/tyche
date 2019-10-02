@@ -67,7 +67,7 @@ func main() {
 		spawnWorker(workerID, port)
 		// Have to wait?
 		time.Sleep(5 * time.Millisecond)
-		endpoint := "http://localhost:" + port + "/rnd?n=50"
+		endpoint := "http://localhost:" + port + "/rnd?n=100"
 		wg.Add(1)
 		go callEndpoint(&wg, endpoint, numsChan)
 	}
@@ -77,5 +77,5 @@ func main() {
 		totalNums += s
 	}
 	elapsed := time.Since(start)
-	fmt.Println("Time elapsed:", elapsed, totalNums)
+	fmt.Printf("Time elapsed: %v Total number: %d\n", elapsed, totalNums)
 }
