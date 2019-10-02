@@ -67,7 +67,7 @@ func main() {
 		spawnWorker(workerID, port)
 		// Have to wait?
 		time.Sleep(5 * time.Millisecond)
-		endpoint := "http://localhost:" + port + "/rnd?n=13"
+		endpoint := "http://localhost:" + port + "/rnd?n=15"
 		wg.Add(1)
 		go callEndpoint(&wg, endpoint, numsChan)
 	}
