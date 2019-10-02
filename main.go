@@ -59,15 +59,15 @@ func main() {
 	start := time.Now()
 	var wg sync.WaitGroup
 	totalNums := 0
-	numsChan := make(chan int, 16)
+	numsChan := make(chan int, 17)
 
-	for i := 1; i < 17; i++ {
+	for i := 1; i < 18; i++ {
 		workerID := strconv.Itoa(i)
 		port := strconv.Itoa(3000 + i)
 		spawnWorker(workerID, port)
 		// Have to wait?
 		time.Sleep(5 * time.Millisecond)
-		endpoint := "http://localhost:" + port + "/rnd?n=100"
+		endpoint := "http://localhost:" + port + "/rnd?n=200"
 		wg.Add(1)
 		go callEndpoint(&wg, endpoint, numsChan)
 	}
