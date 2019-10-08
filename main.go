@@ -44,9 +44,10 @@ func callEndpoint(endpoint string, ch chan<- int) {
 		i := strings.Index(rnd, "\n")
 		num, _ := strconv.Atoi(rnd[4:i])
 		ch <- num
+		nums = append(nums, num)
 	}
 
-	fmt.Printf("Consumer finished: %s, numbers:%v length:%d\n", endpoint, nums, len(nums))
+	fmt.Printf("Consumer finished: %s, length:%d\n", endpoint, len(nums))
 }
 
 func worker(jobs <-chan int, results chan<- int) {
@@ -73,6 +74,7 @@ func main() {
 	results := make(chan int, 200)
 
 	go worker(jobs, results)
+	// go worker(jobs, results)
 
 	for i := 1; i < 20; i++ {
 		jobs <- i
@@ -81,7 +83,7 @@ func main() {
 
 	for {
 		num = <-results
-		// fmt.Printf("%d ", num)
+		// fmt.Println(num, nums)
 		nums = append(nums, num)
 		if len(nums) >= 150 {
 			break
