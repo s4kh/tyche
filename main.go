@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -26,8 +25,7 @@ func spawnWorker(workerID string, port string) {
 	fmt.Printf("Spawned %s on :%s\n", workerID, port)
 }
 
-func callEndpoint(wg *sync.WaitGroup, endpoint string, ch chan int) {
-	defer wg.Done()
+func callEndpoint(endpoint string, ch chan<- int) {
 	var nums []int
 	fmt.Println("Consumer started:", endpoint)
 	res, err := http.Get(endpoint)
@@ -45,10 +43,22 @@ func callEndpoint(wg *sync.WaitGroup, endpoint string, ch chan int) {
 		rnd := string(p[:n])
 		i := strings.Index(rnd, "\n")
 		num, _ := strconv.Atoi(rnd[4:i])
-		nums = append(nums, num)
+		ch <- num
 	}
-	ch <- len(nums)
+
 	fmt.Printf("Consumer finished: %s, numbers:%v length:%d\n", endpoint, nums, len(nums))
+}
+
+func worker(jobs <-chan int, results chan<- int) {
+	for i := range jobs {
+		workerID := strconv.Itoa(i)
+		port := strconv.Itoa(3000 + i)
+		spawnWorker(workerID, port)
+		// Have to wait?
+		time.Sleep(5 * time.Millisecond)
+		endpoint := "http://localhost:" + port + "/rnd?n=15"
+		go callEndpoint(endpoint, results)
+	}
 }
 
 func main() {
@@ -56,26 +66,27 @@ func main() {
 		TODOs:
 		What is Data sample? 150 data samples
 	*/
+	var nums []int
+	num := 0
 	start := time.Now()
-	var wg sync.WaitGroup
-	totalNums := 0
-	numsChan := make(chan int, 17)
+	jobs := make(chan int, 30)
+	results := make(chan int, 200)
 
-	for i := 1; i < 18; i++ {
-		workerID := strconv.Itoa(i)
-		port := strconv.Itoa(3000 + i)
-		spawnWorker(workerID, port)
-		// Have to wait?
-		time.Sleep(5 * time.Millisecond)
-		endpoint := "http://localhost:" + port + "/rnd?n=15"
-		wg.Add(1)
-		go callEndpoint(&wg, endpoint, numsChan)
+	go worker(jobs, results)
+
+	for i := 1; i < 20; i++ {
+		jobs <- i
 	}
-	wg.Wait()
-	close(numsChan)
-	for s := range numsChan {
-		totalNums += s
+	close(jobs)
+
+	for {
+		num = <-results
+		// fmt.Printf("%d ", num)
+		nums = append(nums, num)
+		if len(nums) >= 150 {
+			break
+		}
 	}
 	elapsed := time.Since(start)
-	fmt.Printf("Time elapsed: %v Total number: %d\n", elapsed, totalNums)
+	fmt.Printf("Time elapsed: %v Total number: %d\n", elapsed, len(nums))
 }
